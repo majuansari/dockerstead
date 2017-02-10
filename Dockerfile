@@ -26,7 +26,7 @@ apt-get update
 RUN echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale  && \
     locale-gen en_US.UTF-8  && \
     ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-    
+
 # setup bash
 COPY .bash_aliases /root
 
@@ -44,7 +44,7 @@ RUN rm -rf /etc/nginx/sites-available/default && \
     usermod -u 1000 www-data && \
     chown -Rf www-data.www-data /var/www/html/ && \
     sed -i -e"s/worker_processes  1/worker_processes 5/" /etc/nginx/nginx.conf
-VOLUME ["/var/www/html/app"]
+VOLUME ["/var/www/html/ascent"]
 VOLUME ["/var/cache/nginx"]
 VOLUME ["/var/log/nginx"]
 
@@ -58,11 +58,11 @@ RUN sed -i "/listen = .*/c\listen = [::]:9000" /etc/php/7.1/fpm/pool.d/www.conf 
     sed -i -e "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.1/cli/php.ini && \
     sed -i -e "s/display_errors = .*/display_errors = On/" /etc/php/7.1/cli/php.ini && \
     sed -i -e "s/;date.timezone.*/date.timezone = UTC/" /etc/php/7.1/cli/php.ini
-RUN sed -i -e "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.1/fpm/php.ini && \ 
-    sed -i -e "s/display_errors = .*/display_errors = On/" /etc/php/7.1/fpm/php.ini && \ 
+RUN sed -i -e "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.1/fpm/php.ini && \
+    sed -i -e "s/display_errors = .*/display_errors = On/" /etc/php/7.1/fpm/php.ini && \
     sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.1/fpm/php.ini && \
     sed -i -e "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/7.1/fpm/php.ini && \
-    sed -i -e "s/post_max_size = .*/post_max_size = 100M/" /etc/php/7.1/fpm/php.ini && \ 
+    sed -i -e "s/post_max_size = .*/post_max_size = 100M/" /etc/php/7.1/fpm/php.ini && \
     sed -i -e "s/;date.timezone.*/date.timezone = UTC/" /etc/php/7.1/fpm/php.ini
 RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.1/fpm/php-fpm.conf
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /etc/php/7.1/fpm/pool.d/www.conf && \
@@ -77,30 +77,22 @@ RUN phpdismod -s cli xdebug
 RUN phpenmod mcrypt && \
     mkdir -p /run/php/ && chown -Rf www-data.www-data /run/php
 
-# install sqlite 
+# install sqlite
 RUN apt-get install -y sqlite3 libsqlite3-dev
 
-# install mysql 
-RUN echo mysql-community-server mysql-community-server/root-pass password secret | debconf-set-selections;\
-    echo mysql-community-server mysql-community-server/re-root-pass password secret | debconf-set-selections;\
-    apt-get install -y mysql-server && \
-    echo "default_password_lifetime = 0" >> /etc/mysql/mysql.conf.d/mysqld.cnf && \
-    sed -i '/^bind-address/s/bind-address.*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
-#RUN mysql --user="root" --password="secret" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"    
-RUN service mysql restart
-
-RUN /usr/sbin/mysqld & \
-    sleep 10s && \
-    echo "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION; CREATE USER 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret'; GRANT ALL ON *.* TO 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION; GRANT ALL ON *.* TO 'homestead'@'%' IDENTIFIED BY 'secret' WITH GRANT OPTION; FLUSH PRIVILEGES; CREATE DATABASE ascent;" | mysql
+# install mysql
+ADD mysql.sh /mysql.sh
+RUN chmod +x /*.sh
+RUN ./mysql.sh
 VOLUME ["/var/lib/mysql"]
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer && \
     printf "\nPATH=\"~/.composer/vendor/bin:\$PATH\"\n" | tee -a ~/.bashrc
-    
 
-# install redis 
+
+# install redis
 RUN apt-get install -y redis-server memcached
 
 
@@ -113,17 +105,16 @@ RUN apt-get install -y --force-yes beanstalkd && \
 # install supervisor
 RUN apt-get install -y supervisor && \
     mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 VOLUME ["/var/log/supervisor"]
 
 
 # install nodejs
-RUN apt-get install -y nodejs
+#RUN apt-get install -y nodejs
 
-RUN /usr/bin/npm install -g gulp
-RUN /usr/bin/npm install -g webpack
-RUN /usr/bin/npm install -g bower
-RUN /usr/bin/npm install -g yarn
+#RUN /usr/bin/npm install -g gulp
+#RUN /usr/bin/npm install -g webpack
+#RUN /usr/bin/npm install -g bower
+#RUN /usr/bin/npm install -g yarn
 
 # clean up our mess
 RUN apt-get remove --purge -y software-properties-common && \
@@ -137,7 +128,8 @@ RUN apt-get remove --purge -y software-properties-common && \
 
 # expose ports
 EXPOSE 80 22 443 3306 6379
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # set container entrypoints
 ENTRYPOINT ["/bin/bash","-c"]
-CMD ["service php7.1-fpm start ;/usr/bin/supervisord"]
+CMD ["/usr/bin/supervisord"]
