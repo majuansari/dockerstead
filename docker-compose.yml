@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+
+### Code Box ###
+    homestead:
+        build:
+            context: .
+        ports:
+            - "8000:80" # web
+            - "2222:22" # ssh
+        volumes:
+            - ../bp:/var/www/html/app
+            - ./data/mysql:/var/lib/mysql         
+        # env_file: .env
+        restart: always
+
+    volumes_source:
+        image: tianon/true
+        volumes:
+            - ../bp:/var/www/bp
+
+###  Data source ###
+
+    volumes_data:
+        image: tianon/true
+        volumes:
+            - ../bp:/var/www/html/app
+            - ./data/mysql:/var/lib/mysql
+            - ./data/postgres:/var/lib/postgresql/data
+            - ./data/sessions:/sessions
+            - ./data/memcached:/var/lib/memcached
+            - ./data/redis:/data
