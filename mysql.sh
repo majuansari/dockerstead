@@ -18,7 +18,7 @@ mysql --user="root"  -e "CREATE USER 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret
 mysql --user="root"  -e "GRANT ALL ON *.* TO 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
 mysql --user="root"  -e "GRANT ALL ON *.* TO 'homestead'@'%' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
 mysql --user="root"  -e "FLUSH PRIVILEGES;"
-mysql --user="root"  -e "CREATE DATABASE homestead;"
+mysql --user="root"  -e "CREATE DATABASE ascent;"
 service mysql restart
 
 # Add Timezone Support To MySQL

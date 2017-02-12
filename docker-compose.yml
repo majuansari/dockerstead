@@ -4,11 +4,13 @@ services:
 
 ### Code Box ###
     homestead:
-        build:
-            context: .
+        image: majuansari/dockerstead:base
+        # build:
+        #     context: .
         ports:
             - "8000:80" # web
             - "2222:22" # ssh
+            - "33306:3306"
         volumes:
             - ../bp:/var/www/html/ascent
         # env_file: .env
