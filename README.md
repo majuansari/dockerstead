@@ -27,7 +27,8 @@ Homestead like environment for Docker
 > http://app.dev:8000  is the default url to run the site
 > [Make sure you add app.dev to the hosts file]
 > 
-Default db config -
+
+**Default db config**
 
     username: homestead
     password: secret
