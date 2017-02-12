@@ -25,8 +25,13 @@ Homestead like environment for Docker
 
 
 > http://app.dev:8000  is the default url to run the site
-> [Make sure you add app.dev to the hosts file]
-> 
+
+Open your `/etc/hosts` file and map your localhost address `127.0.0.1` to the `app.dev` domain, by adding the following:
+
+```bash
+127.0.0.1    app.dev
+```
+If you prefer a different domain name, you can configure that within nginx configuration
 
 **Default db config**
 
