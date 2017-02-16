@@ -12,6 +12,6 @@ services:
             - "2222:22" # ssh
             - "33306:3306"
         volumes:
-            - ../bp:/var/www/html/ascent #configure your project director path here
+            - ../ascent:/var/www/html/ascent #configure your project director path here
         # env_file: .env
         restart: always

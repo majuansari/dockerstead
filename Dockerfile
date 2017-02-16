@@ -109,12 +109,12 @@ VOLUME ["/var/log/supervisor"]
 
 
 # install nodejs
-#RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs
 
-#RUN /usr/bin/npm install -g gulp
-#RUN /usr/bin/npm install -g webpack
-#RUN /usr/bin/npm install -g bower
-#RUN /usr/bin/npm install -g yarn
+RUN /usr/bin/npm install -g gulp
+RUN /usr/bin/npm install -g webpack
+RUN /usr/bin/npm install -g bower
+RUN /usr/bin/npm install -g yarn
 
 # clean up our mess
 RUN apt-get remove --purge -y software-properties-common && \
