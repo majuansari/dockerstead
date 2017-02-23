@@ -1,7 +1,7 @@
 # dockerstead
 Homestead like environment for Docker
 
-Default Softwares Installed
+**Default Softwares Installed**
 
     Ubuntu 16.04
     Git
@@ -15,7 +15,7 @@ Default Softwares Installed
     Memcached
     Beanstalkd
 
-Steps to setup the docker environment
+**Steps to setup the docker environment**
 
     1. git clone https://github.com/majuansari/dockerstead.git
     2. cd dockerstead
@@ -24,10 +24,16 @@ Steps to setup the docker environment
     5. To ssh into the server run - docker-compose exec homestead bash
 
 
-http://app.dev:8000  is the default configuration to run the site
-[Make sure you add app.dev to the hosts file]
+> http://app.dev:8000  is the default url to run the site
 
-Default db config -
+Open your `/etc/hosts` file and map your localhost address `127.0.0.1` to the `app.dev` domain, by adding the following:
+
+```bash
+127.0.0.1    app.dev
+```
+If you prefer a different domain name, you can configure that within nginx configuration
+
+**Default db config**
 
     username: homestead
     password: secret
