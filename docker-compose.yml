@@ -15,3 +15,14 @@ services:
             - ../ascent:/var/www/html/ascent #configure your project director path here
         # env_file: .env
         restart: always
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        environment:
+         - PMA_ARBITRARY=1
+        restart: always
+        ports:
+         - 8001:80
+        volumes:
+         - /sessions
