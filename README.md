@@ -1,4 +1,5 @@
 # dockerstead
+AWS
 Homestead like environment for Docker
 
 **Default Softwares Installed**
